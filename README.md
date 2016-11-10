@@ -69,3 +69,7 @@ Output:
 300
 400
 ```
+
+## License
+
+SwiftAsync is released under the MIT license. See LICENSE for details.
