@@ -1,3 +1,4 @@
+# SwiftAsync 1.0.1
 Asynchronous functions for swift. Inspired by AsyncJS.
 
 ## Usage
