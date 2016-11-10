@@ -18,7 +18,7 @@ func example() {
             }
         }, 
         done: {
-            print("each done. download finished.")
+            print("each done. downloads finished.")
         }, 
         empty: {
             print("items are empty")
@@ -56,7 +56,7 @@ SwiftAsync.eachSeries(items,
         }
     }, 
     done: {
-        print("each done. download finished.")
+        print("eachSeries done. downloads finished.")
     }, 
     empty: {
         print("items are empty")
