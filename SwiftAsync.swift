@@ -8,32 +8,34 @@
 import Foundation
 
 open class SwiftAsync {
+    var items: [Any]?
+    public var doneBlock: (()->())? = nil
+
     // each item in parallel
-    public static func each(_ items: [Any]?, iteratee: @escaping(Any, @escaping() -> ()) -> (), done: @escaping() -> ()) {
-        each(items!, iteratee: iteratee, done: done, empty: nil)
-    }
-    public static func each(_ items: [Any]?, iteratee: @escaping(Any, @escaping() -> ()) -> (), done: @escaping() -> (), empty: (() -> Void)? = nil) {
-        if items != nil && !items!.isEmpty {
-            each(items!, series: false, iteratee: iteratee, done: done)
-        } else {
-            empty?()
-        }
+    public static func each(_ items: [Any]?, iteratee: @escaping(Any, @escaping() -> ()) -> ()) -> SwiftAsync {
+        return each(items, series: false, iteratee: iteratee)
     }
     
     // each item in series
-    public static func eachSeries(_ items: [Any]?, iteratee: @escaping(Any, @escaping() -> ()) -> (), done: @escaping() -> ()) {
-        eachSeries(items!, iteratee: iteratee, done: done, empty: nil)
+    public static func eachSeries(_ items: [Any]?, iteratee: @escaping(Any, @escaping() -> ()) -> ()) -> SwiftAsync {
+        return each(items, series: true, iteratee: iteratee)
     }
-    public static func eachSeries(_ items: [Any]?, iteratee: @escaping(Any, @escaping() -> ()) -> (), done: @escaping() -> (), empty: (() -> Void)? = nil) {
+    
+    private static func each(_ items: [Any]?, series: Bool = false, iteratee: @escaping(Any, @escaping() -> ()) -> ()) -> SwiftAsync {
+        let async = SwiftAsync()
+        
         if items != nil && !items!.isEmpty {
-            each(items!, series: true, iteratee: iteratee, done: done)
-        } else {
-            empty?()
+            async.items = items
+            DispatchQueue.main.async {
+                async.each(items!, series: series, iteratee: iteratee)
+            }
         }
+        
+        return async
     }
     
     // internal function
-    private static func each(_ items: [Any], series: Bool = false, iteratee: @escaping(Any, @escaping() -> ()) -> (), done: @escaping() -> ()) {
+    private func each(_ items: [Any], series: Bool = false, iteratee: @escaping(Any, @escaping() -> ()) -> ()) {
         var isDone: Bool = false
         var running: Int = 0
         var next: Int = -1
@@ -41,7 +43,8 @@ open class SwiftAsync {
         func iterateeCallback() {
             running -= 1
             if (isDone && running <= 0) {
-                return done()
+                self.doneBlock?()
+                return
             }
             if series {
                 replenish()
@@ -61,7 +64,7 @@ open class SwiftAsync {
             if (elem == nil) {
                 isDone = true
                 if (running <= 0) {
-                    done()
+                    self.doneBlock?()
                 }
                 return
             }
@@ -75,5 +78,19 @@ open class SwiftAsync {
                 replenish()
             }
         }
+    }
+    
+    @discardableResult
+    public func done(_ completion: @escaping() -> ()) -> SwiftAsync {
+        self.doneBlock = completion
+        return self
+    }
+    
+    @discardableResult
+    public func empty(_ completion: @escaping() -> ()) -> SwiftAsync {
+        if items == nil ||  (items != nil && items!.isEmpty) {
+            completion()
+        }
+        return self
     }
 }
