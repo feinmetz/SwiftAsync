@@ -10,19 +10,18 @@ Applies the function iteratee to each item in coll, in parallel.
 func example() {
     let items: Array = [100, 200, 300, 400]
 
-    SwiftAsync.each(items,
-        iteratee: {
-            [unowned self] item, callback in
-            self.simulDownload {
-                callback()
-            }
-        }, 
-        done: {
-            print("each done. downloads finished.")
-        }, 
-        empty: {
-            print("items are empty")
-        })
+    SwiftAsync.each(items) {
+        [unowned self] item, callback in
+        self.download {
+            callback()
+        }
+    }
+    .done {
+        print("each done. downloads finished")
+    }
+    .empty {
+        print("items are empty")
+    }
 }
 
 func simulDownload(completion: @escaping() -> ()) {
@@ -48,19 +47,18 @@ The same as each but runs only a single async operation at a time.
 ```swift
 let items: Array = [100, 200, 300, 400]
 
-SwiftAsync.eachSeries(items,
-    iteratee: {
-        [unowned self] item, callback in
-        self.simulDownload {
-            callback()
-        }
-    }, 
-    done: {
-        print("eachSeries done. downloads finished.")
-    }, 
-    empty: {
-        print("items are empty")
-    })
+SwiftAsync.eachSeries(items) {
+    [unowned self] item, callback in
+    self.download {
+        callback()
+    }
+}
+.done {
+    print("each done. downloads finished")
+}
+.empty {
+    print("items are empty")
+}
 ```
 
 Output:
