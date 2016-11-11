@@ -39,6 +39,7 @@ Possible output:
 200
 300
 100
+each done. downloads finished
 ```
 
 ### Series call
@@ -67,6 +68,7 @@ Output:
 200
 300
 400
+each done. downloads finished
 ```
 
 ## License
