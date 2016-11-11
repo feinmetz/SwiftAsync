@@ -1,4 +1,4 @@
-# SwiftAsync 1.0.1
+# SwiftAsync 1.1.0
 SwiftAsync is a utility module which provides functions for working with asynchronous Swift. Inspired by AsyncJS.
 
 ## Usage
